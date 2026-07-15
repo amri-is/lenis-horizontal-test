@@ -1,122 +1,80 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from './assets/vite.svg'
-import heroImg from './assets/hero.png'
-import './App.css'
+// App.jsx
+import { useEffect, useRef } from 'react'
+import { ReactLenis, useLenis } from 'lenis/react'
+import gsap from 'gsap'
+import { ScrollTrigger } from 'gsap/ScrollTrigger'
 
-function App() {
-  const [count, setCount] = useState(0)
+gsap.registerPlugin(ScrollTrigger)
+
+export default function App() {
+  const wrapperRef = useRef(null)
+  const trackRef = useRef(null)
+
+  // keep ScrollTrigger in sync with lenis's smoothed scroll position
+  useLenis(ScrollTrigger.update)
+
+  useEffect(() => {
+    const track = trackRef.current
+    const wrapper = wrapperRef.current
+
+    const ctx = gsap.context(() => {
+      const getScrollAmount = () => track.scrollWidth - window.innerWidth
+
+      const tween = gsap.to(track, {
+        x: () => -getScrollAmount(),
+        ease: 'none',
+        scrollTrigger: {
+          trigger: wrapper,
+          start: 'top top',
+          end: () => `+=${getScrollAmount()}`,
+          scrub: 1,
+          pin: true,
+          invalidateOnRefresh: true,
+          // no snap — continuous strip, not discrete pages
+        },
+      })
+
+      return () => tween.scrollTrigger?.kill()
+    })
+
+    return () => ctx.revert()
+  }, [])
 
   return (
-    <>
-      <section id="center">
-        <div className="hero">
-          <img src={heroImg} className="base" width="170" height="179" alt="" />
-          <img src={reactLogo} className="framework" alt="React logo" />
-          <img src={viteLogo} className="vite" alt="Vite logo" />
-        </div>
-        <div>
-          <h1>Get started</h1>
-          <p>
-            Edit <code>src/App.jsx</code> and save to test <code>HMR</code>
-          </p>
-        </div>
-        <button
-          type="button"
-          className="counter"
-          onClick={() => setCount((count) => count + 1)}
-        >
-          Count is {count}
-        </button>
-      </section>
+    <ReactLenis root options={{ autoRaf: false }}>
+      <GsapTicker />
 
-      <div className="ticks"></div>
+      <section className="panel">1</section>
+      <section className="panel">2</section>
 
-      <section id="next-steps">
-        <div id="docs">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#documentation-icon"></use>
-          </svg>
-          <h2>Documentation</h2>
-          <p>Your questions, answered</p>
-          <ul>
-            <li>
-              <a href="https://vite.dev/" target="_blank">
-                <img className="logo" src={viteLogo} alt="" />
-                Explore Vite
-              </a>
-            </li>
-            <li>
-              <a href="https://react.dev/" target="_blank">
-                <img className="button-icon" src={reactLogo} alt="" />
-                Learn more
-              </a>
-            </li>
-          </ul>
-        </div>
-        <div id="social">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#social-icon"></use>
-          </svg>
-          <h2>Connect with us</h2>
-          <p>Join the Vite community</p>
-          <ul>
-            <li>
-              <a href="https://github.com/vitejs/vite" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#github-icon"></use>
-                </svg>
-                GitHub
-              </a>
-            </li>
-            <li>
-              <a href="https://chat.vite.dev/" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#discord-icon"></use>
-                </svg>
-                Discord
-              </a>
-            </li>
-            <li>
-              <a href="https://x.com/vite_js" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#x-icon"></use>
-                </svg>
-                X.com
-              </a>
-            </li>
-            <li>
-              <a href="https://bsky.app/profile/vite.dev" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#bluesky-icon"></use>
-                </svg>
-                Bluesky
-              </a>
-            </li>
-          </ul>
+      <section className="horizontal-wrapper" ref={wrapperRef}>
+        <div className="horizontal-track" ref={trackRef}>
+          <div className="panel">H1</div>
+          <div className="panel">H2</div>
+          <div className="panel">H3</div>
+          <div className="panel">H4</div>
+          <div className="panel">H5</div>
+          <div className="panel">H6</div>
+          <div className="panel">H7</div>
+          <div className="panel horizontal-last-panel">H7</div>
         </div>
       </section>
 
-      <div className="ticks"></div>
-      <section id="spacer"></section>
-    </>
+      <section className="panel">3</section>
+      <section className="panel">4</section>
+    </ReactLenis>
   )
 }
 
-export default App
+// drives lenis's raf off gsap's ticker -> single raf loop, no fighting
+function GsapTicker() {
+  const lenis = useLenis()
+  useEffect(() => {
+    if (!lenis) return
+    const update = (time) => lenis.raf(time * 1000)
+    gsap.ticker.add(update)
+    gsap.ticker.lagSmoothing(0)
+    return () => gsap.ticker.remove(update)
+  }, [lenis])
+  return null
+}
