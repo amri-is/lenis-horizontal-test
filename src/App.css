@@ -20,31 +20,27 @@ html.lenis body {
   font-size: 4rem;
 }
 
-.horizontal-wrapper {
+.hz-wrapper {
   height: 100vh;
   overflow: hidden;
 }
 
-.horizontal-track {
+.hz-track {
   display: flex;
   align-items: center;
   height: 100%;
   width: max-content;
   /* shrink-wraps to content, not fixed vw math */
   gap: 4rem;
-  padding: 0 50vw;
+  padding: 0 20vw;
   /* breathing room start/end */
 }
 
-.horizontal-track .panel {
+.hz-track .panel {
   width: 60vw;
   /* whatever size makes sense per item — no longer forced 100vw */
   flex-shrink: 0;
   height: 60vh;
-}
-
-.horizontal-last-panel {
-  opacity: 0;
 }
 
 .panel:nth-child(odd) {

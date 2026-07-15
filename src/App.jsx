@@ -9,20 +9,39 @@ gsap.registerPlugin(ScrollTrigger)
 export default function App() {
   const wrapperRef = useRef(null)
   const trackRef = useRef(null)
+  const firstPanelRef = useRef(null)
+  const lastPanelRef = useRef(null) // new
 
-  // keep ScrollTrigger in sync with lenis's smoothed scroll position
   useLenis(ScrollTrigger.update)
 
   useEffect(() => {
     const track = trackRef.current
     const wrapper = wrapperRef.current
+    const firstPanel = firstPanelRef.current
+    const lastPanel = lastPanelRef.current
 
     const ctx = gsap.context(() => {
       const getScrollAmount = () => track.scrollWidth - window.innerWidth
 
-      const tween = gsap.to(track, {
-        x: () => -getScrollAmount(),
+      // first panel padding shrink, before pin starts
+      gsap.set(firstPanel, { marginLeft: '30vw' })
+      gsap.to(firstPanel, {
+        marginLeft: '0vw',
         ease: 'none',
+        scrollTrigger: {
+          trigger: wrapper,
+          start: 'top bottom',
+          end: 'top top',
+          scrub: true,
+          invalidateOnRefresh: true,
+        },
+      })
+
+      // last panel start state
+      gsap.set(lastPanel, { y: '100%', opacity: 0 })
+
+      // pin timeline: track scroll (full) + last panel reveal (last 20%)
+      const tl = gsap.timeline({
         scrollTrigger: {
           trigger: wrapper,
           start: 'top top',
@@ -30,11 +49,13 @@ export default function App() {
           scrub: 1,
           pin: true,
           invalidateOnRefresh: true,
-          // no snap — continuous strip, not discrete pages
         },
       })
 
-      return () => tween.scrollTrigger?.kill()
+      tl.to(track, { x: () => -getScrollAmount(), ease: 'none', duration: 1 }, 0)
+      tl.to(lastPanel, { y: '0%', opacity: 1, ease: 'none', duration: 0.2 }, 0.8)
+
+      return () => tl.scrollTrigger?.kill()
     })
 
     return () => ctx.revert()
@@ -47,16 +68,16 @@ export default function App() {
       <section className="panel">1</section>
       <section className="panel">2</section>
 
-      <section className="horizontal-wrapper" ref={wrapperRef}>
-        <div className="horizontal-track" ref={trackRef}>
-          <div className="panel">H1</div>
+      <section className="hz-wrapper" ref={wrapperRef}>
+        <div className="hz-track" ref={trackRef}>
+          <div className="panel" ref={firstPanelRef}>H1</div>
           <div className="panel">H2</div>
           <div className="panel">H3</div>
           <div className="panel">H4</div>
           <div className="panel">H5</div>
           <div className="panel">H6</div>
           <div className="panel">H7</div>
-          <div className="panel horizontal-last-panel">H7</div>
+          <div className="panel" ref={lastPanelRef}>H8</div>
         </div>
       </section>
 
@@ -66,7 +87,6 @@ export default function App() {
   )
 }
 
-// drives lenis's raf off gsap's ticker -> single raf loop, no fighting
 function GsapTicker() {
   const lenis = useLenis()
   useEffect(() => {

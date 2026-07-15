@@ -31,3 +31,5 @@ dist-ssr
 .windsurf
 .continue
 .aider*
+.agents
+skills-lock.json
