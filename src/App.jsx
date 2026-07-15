@@ -26,7 +26,7 @@ export default function App() {
       const getScrollAmount = () => track.scrollWidth - window.innerWidth
 
       // first panel padding shrink, before pin starts
-      gsap.set(firstPanel, { marginLeft: '30vw' })
+      gsap.set(firstPanel, { marginLeft: '80vw' })
       gsap.to(firstPanel, {
         marginLeft: '0vw',
         ease: 'none',
@@ -40,7 +40,7 @@ export default function App() {
       })
 
       // last panel start state
-      gsap.set(lastPanel, { y: '100%', opacity: 0, width: `100vw` })
+      gsap.set(lastPanel, { y: '100%', opacity: 0, width: '100vw' })
 
       // pin timeline: track scroll (full) + last panel reveal (last 20%)
       const tl = gsap.timeline({
@@ -55,7 +55,7 @@ export default function App() {
       })
 
       tl.to(track, { x: () => -getScrollAmount(), ease: 'none', duration: 1 }, 0)
-      tl.to(lastPanel, { y: '0%', opacity: 1, ease: 'none', duration: 0.2 }, 0.8)
+      tl.to(lastPanel, { y: '0%', opacity: 1, ease: 'none', duration: 0.4 }, 0.6)
 
       return () => tl.scrollTrigger?.kill()
     })
@@ -106,16 +106,17 @@ useEffect(() => {
       <section className="panel">1</section>
       <section className="panel">2</section>
 
-      <section className="hz-wrapper" ref={wrapperRef}>
-        <div className="hz-track" ref={trackRef}>
-          <div className="panel" ref={firstPanelRef}>H1</div>
+      <section className="hz-wrapper" style={{ backgroundColor: '#e7de57' }} ref={wrapperRef}>
+        <div className="hz-track" style={{ backgroundColor: '#c243a2' }} ref={trackRef}>
+          <div className="panel-space-big" ref={firstPanelRef}></div>
+          <div className="panel">H1</div>
+          <div className="panel-space"></div>
           <div className="panel">H2</div>
+          <div className="panel-space"></div>
           <div className="panel">H3</div>
-          <div className="panel">H4</div>
-          <div className="panel">H5</div>
-          <div className="panel">H6</div>
-          <div className="panel">H7</div>
-          <div className="panel" ref={lastPanelRef}>H8</div>
+          <div className="panel-space"></div>
+          <div className="panel" ref={lastPanelRef}>H4</div>
+          {/* <div className="panel-space-big"></div> */}
         </div>
       </section>
 

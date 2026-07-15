@@ -41,8 +41,8 @@ html.lenis body {
   height: 100%;
   width: max-content;
   /* shrink-wraps to content, not fixed vw math */
-  gap: 4rem;
-  padding-left: 20vw;
+  /* gap: 4rem; */
+  /* padding-left: 20vw; */
   /* breathing room start/end */
 }
 
@@ -61,6 +61,18 @@ html.lenis body {
 .panel:nth-child(even) {
   background: #ffb8b8;
   /* pastel red */
+}
+
+.panel-space-big {
+  height: 100%;
+  width: 10em;
+  background-color: #7afcb5;
+}
+
+.panel-space {
+  height: 100%;
+  width: 5em;
+  background-color: #7ac1fc;
 }
 
 .scroll-indicator {
