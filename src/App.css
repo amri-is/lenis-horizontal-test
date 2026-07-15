@@ -32,7 +32,7 @@ html.lenis body {
   width: max-content;
   /* shrink-wraps to content, not fixed vw math */
   gap: 4rem;
-  padding: 0 15vw;
+  padding: 0 50vw;
   /* breathing room start/end */
 }
 
