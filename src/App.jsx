@@ -10,9 +10,11 @@ export default function App() {
   const wrapperRef = useRef(null)
   const trackRef = useRef(null)
   const firstPanelRef = useRef(null)
-  const lastPanelRef = useRef(null) // new
+  const lastPanelRef = useRef(null)
+  const scrollTrackRef = useRef(null)
+  const scrollThumbRef = useRef(null)
 
-  useLenis(ScrollTrigger.update)
+  const lenis = useLenis(ScrollTrigger.update)
 
   useEffect(() => {
     const track = trackRef.current
@@ -32,13 +34,13 @@ export default function App() {
           trigger: wrapper,
           start: 'top bottom',
           end: 'top top',
-          scrub: true,
+          scrub: 1,
           invalidateOnRefresh: true,
         },
       })
 
       // last panel start state
-      gsap.set(lastPanel, { y: '100%', opacity: 0 })
+      gsap.set(lastPanel, { y: '100%', opacity: 0, width: `100vw` })
 
       // pin timeline: track scroll (full) + last panel reveal (last 20%)
       const tl = gsap.timeline({
@@ -61,9 +63,58 @@ export default function App() {
     return () => ctx.revert()
   }, [])
 
+  // scroll indicator — sync + drag
+  useEffect(() => {
+    if (!lenis) return
+    const wrap = scrollTrackRef.current
+    const bar = scrollThumbRef.current
+    if (!wrap || !bar) return
+
+    const maxTop = () => wrap.clientHeight - bar.clientHeight
+
+    const onScroll = ({ progress }) => {
+      bar.style.top = `${progress * maxTop()}px`
+    }
+    lenis.on('scroll', onScroll)
+
+    let dragging = false
+    let startY = 0
+    let startTop = 0
+
+    const onPointerDown = (e) => {
+      dragging = true
+      startY = e.clientY ?? e.touches?.[0]?.clientY
+      startTop = parseFloat(getComputedStyle(bar).top) || 0
+    }
+
+    const onPointerMove = (e) => {
+      if (!dragging) return
+      const y = e.clientY ?? e.touches?.[0]?.clientY
+      const newTop = Math.min(Math.max(startTop + (y - startY), 0), maxTop())
+      lenis.scrollTo((newTop / maxTop()) * lenis.limit, { immediate: true })
+    }
+
+    const onPointerUp = () => { dragging = false }
+
+    bar.addEventListener('pointerdown', onPointerDown)
+    window.addEventListener('pointermove', onPointerMove)
+    window.addEventListener('pointerup', onPointerUp)
+
+    return () => {
+      lenis.off('scroll', onScroll)
+      bar.removeEventListener('pointerdown', onPointerDown)
+      window.removeEventListener('pointermove', onPointerMove)
+      window.removeEventListener('pointerup', onPointerUp)
+    }
+  }, [lenis])
+
   return (
     <ReactLenis root options={{ autoRaf: false }}>
       <GsapTicker />
+
+      <div className="scroll-indicator" ref={scrollTrackRef}>
+        <div className="scroll-indicator-bar" ref={scrollThumbRef}></div>
+      </div>
 
       <section className="panel">1</section>
       <section className="panel">2</section>
