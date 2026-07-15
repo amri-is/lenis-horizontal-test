@@ -63,50 +63,37 @@ export default function App() {
     return () => ctx.revert()
   }, [])
 
-  // scroll indicator — sync + drag
-  useEffect(() => {
-    if (!lenis) return
-    const wrap = scrollTrackRef.current
-    const bar = scrollThumbRef.current
-    if (!wrap || !bar) return
+// scroll indicator — sync + fade
+useEffect(() => {
+  if (!lenis) return
+  const wrap = scrollTrackRef.current
+  const bar = scrollThumbRef.current
+  if (!wrap || !bar) return
 
-    const maxTop = () => wrap.clientHeight - bar.clientHeight
+  const maxTop = () => wrap.clientHeight - bar.clientHeight
 
-    const onScroll = ({ progress }) => {
-      bar.style.top = `${progress * maxTop()}px`
-    }
-    lenis.on('scroll', onScroll)
+  let hideTimeout
 
-    let dragging = false
-    let startY = 0
-    let startTop = 0
+  const onScroll = ({ progress }) => {
+    bar.style.transform = `translateY(${progress * maxTop()}px)`
 
-    const onPointerDown = (e) => {
-      dragging = true
-      startY = e.clientY ?? e.touches?.[0]?.clientY
-      startTop = parseFloat(getComputedStyle(bar).top) || 0
-    }
+    wrap.style.opacity = '1'
+    wrap.style.visibility = 'inherit'
 
-    const onPointerMove = (e) => {
-      if (!dragging) return
-      const y = e.clientY ?? e.touches?.[0]?.clientY
-      const newTop = Math.min(Math.max(startTop + (y - startY), 0), maxTop())
-      lenis.scrollTo((newTop / maxTop()) * lenis.limit, { immediate: true })
-    }
+    clearTimeout(hideTimeout)
+    hideTimeout = setTimeout(() => {
+      wrap.style.opacity = '0'
+      wrap.style.visibility = 'hidden'
+    }, 1000)
+  }
 
-    const onPointerUp = () => { dragging = false }
+  lenis.on('scroll', onScroll)
 
-    bar.addEventListener('pointerdown', onPointerDown)
-    window.addEventListener('pointermove', onPointerMove)
-    window.addEventListener('pointerup', onPointerUp)
-
-    return () => {
-      lenis.off('scroll', onScroll)
-      bar.removeEventListener('pointerdown', onPointerDown)
-      window.removeEventListener('pointermove', onPointerMove)
-      window.removeEventListener('pointerup', onPointerUp)
-    }
-  }, [lenis])
+  return () => {
+    lenis.off('scroll', onScroll)
+    clearTimeout(hideTimeout)
+  }
+}, [lenis])
 
   return (
     <ReactLenis root options={{ autoRaf: false }}>
