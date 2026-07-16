@@ -1,16 +1,36 @@
-# React + Vite
+# Lenis Horizontal Test
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+React + Vite prototype recreating a Lando Norris-style landing page.
+Project shows a long vertical page that contains a pinned horizontal section with scroll-driven movement.
 
-Currently, two official plugins are available:
+## What it does
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+- Simple React app built with `vite`
+- Smooth scrolling via `lenis`
+- Horizontal section animated with `gsap` + `ScrollTrigger`
+- Vertical page flow contains a pinned `hz-wrapper` section that scrolls a wide track horizontally
+- Last horizontal panel reveals while the section remains pinned
+- Custom scroll indicator synced to lenis scroll progress
 
-## React Compiler
+## Key files
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+- `src/App.jsx` — main app logic, `ReactLenis`, `useLenis`, GSAP pin/scroll timeline, horizontal track
+- `src/App.css` — layout and visual styles for panels, horizontal wrapper, scroll indicator
+- `src/main.jsx` — app entry, renders `App`
+- `package.json` — dependencies: `react`, `vite`, `gsap`, `lenis`
 
-## Expanding the ESLint configuration
+## Run locally
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+```bash
+npm install
+npm run dev
+```
+
+Open `http://localhost:5173` and scroll. The page has vertical panels before and after a pinned horizontal section.
+
+## Build
+
+```bash
+npm run build
+npm run preview
+```

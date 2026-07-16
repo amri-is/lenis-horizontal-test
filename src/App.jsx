@@ -66,37 +66,37 @@ export default function App() {
     return () => ctx.revert()
   }, [])
 
-// scroll indicator — sync + fade
-useEffect(() => {
-  if (!lenis) return
-  const wrap = scrollTrackRef.current
-  const bar = scrollThumbRef.current
-  if (!wrap || !bar) return
+  // scroll indicator — sync + fade
+  useEffect(() => {
+    if (!lenis) return
+    const wrap = scrollTrackRef.current
+    const bar = scrollThumbRef.current
+    if (!wrap || !bar) return
 
-  const maxTop = () => wrap.clientHeight - bar.clientHeight
+    const maxTop = () => wrap.clientHeight - bar.clientHeight
 
-  let hideTimeout
+    let hideTimeout
 
-  const onScroll = ({ progress }) => {
-    bar.style.transform = `translateY(${progress * maxTop()}px)`
+    const onScroll = ({ progress }) => {
+      bar.style.transform = `translateY(${progress * maxTop()}px)`
 
-    wrap.style.opacity = '1'
-    wrap.style.visibility = 'inherit'
+      wrap.style.opacity = '1'
+      wrap.style.visibility = 'inherit'
 
-    clearTimeout(hideTimeout)
-    hideTimeout = setTimeout(() => {
-      wrap.style.opacity = '0'
-      wrap.style.visibility = 'hidden'
-    }, 1000)
-  }
+      clearTimeout(hideTimeout)
+      hideTimeout = setTimeout(() => {
+        wrap.style.opacity = '0'
+        wrap.style.visibility = 'hidden'
+      }, 1000)
+    }
 
-  lenis.on('scroll', onScroll)
+    lenis.on('scroll', onScroll)
 
-  return () => {
-    lenis.off('scroll', onScroll)
-    clearTimeout(hideTimeout)
-  }
-}, [lenis])
+    return () => {
+      lenis.off('scroll', onScroll)
+      clearTimeout(hideTimeout)
+    }
+  }, [lenis])
 
   return (
     <ReactLenis root options={{ autoRaf: false }}>
@@ -119,7 +119,6 @@ useEffect(() => {
           <div className="panel">H3</div>
           <div className="panel-space"></div>
           <div className="panel" ref={lastPanelRef}>H4</div>
-          {/* <div className="panel-space-big"></div> */}
         </div>
       </section>
 
