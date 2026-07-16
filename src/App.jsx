@@ -55,6 +55,9 @@ export default function App() {
       })
 
       tl.to(track, { x: () => -getScrollAmount(), ease: 'none', duration: 1 }, 0)
+      // for some reason, it needs to be equal to 1 to make it smooth, otherwise it will be snappy
+      // ex: duration 0.4, then the 3rd args 0.6
+      // so it's 0.4 + o.6 = 1
       tl.to(lastPanel, { y: '0%', opacity: 1, ease: 'none', duration: 0.4 }, 0.6)
 
       return () => tl.scrollTrigger?.kill()
