@@ -65,6 +65,7 @@ html.lenis body {
 
 .hz-track .panel:last-child {
   width: 100vw;
+  position: relative;
 }
 
 .panel:nth-child(odd) {
@@ -88,6 +89,21 @@ html.lenis body {
   height: 100%;
   width: 5em;
   background-color: #7ac1fc;
+}
+
+.panel-object {
+  display: flex;
+  justify-content: space-between;
+  position: absolute;
+  bottom: 0;
+  width: 100%;
+  /* padding: 0 10px; */
+}
+
+.object {
+  margin: 10px;
+  background-color: #830606;
+  opacity: 0;
 }
 
 .scroll-indicator {

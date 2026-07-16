@@ -13,54 +13,57 @@ export default function App() {
   const lastPanelRef = useRef(null)
   const scrollTrackRef = useRef(null)
   const scrollThumbRef = useRef(null)
+  const objParentRef = useRef(null)
+  const objSectionRef = useRef(null)
+  const objRefs = useRef([])
 
   const lenis = useLenis(ScrollTrigger.update)
 
-const introRef = useRef(null)
+  const introRef = useRef(null)
 
-useEffect(() => {
-  const track = trackRef.current
-  const intro = introRef.current
-  const wrapper = wrapperRef.current
-  const lastPanel = lastPanelRef.current
+  useEffect(() => {
+    const track = trackRef.current
+    const intro = introRef.current
+    const wrapper = wrapperRef.current
+    const lastPanel = lastPanelRef.current
 
-  const ctx = gsap.context(() => {
-    const getScrollAmount = () => track.scrollWidth - window.innerWidth
+    const ctx = gsap.context(() => {
+      const getScrollAmount = () => track.scrollWidth - window.innerWidth
 
-    gsap.set(intro, { x: '80vw' })
-    gsap.to(intro, {
-      x: '0vw',
-      ease: 'none',
-      scrollTrigger: {
-        trigger: wrapper,
-        start: 'top bottom',
-        end: 'top top',
-        scrub: 1,
-        invalidateOnRefresh: true,
-      },
+      gsap.set(intro, { x: '80vw' })
+      gsap.to(intro, {
+        x: '0vw',
+        ease: 'none',
+        scrollTrigger: {
+          trigger: wrapper,
+          start: 'top bottom',
+          end: 'top top',
+          scrub: 1,
+          invalidateOnRefresh: true,
+        },
+      })
+
+      gsap.set(lastPanel, { y: '100%', opacity: 0 })
+
+      const tl = gsap.timeline({
+        scrollTrigger: {
+          trigger: wrapper,
+          start: 'top top',
+          end: () => `+=${getScrollAmount()}`,
+          scrub: 1,
+          pin: true,
+          invalidateOnRefresh: true,
+        },
+      })
+
+      tl.to(track, { x: () => -getScrollAmount(), ease: 'none', duration: 1 }, 0)
+      tl.to(lastPanel, { y: '0%', opacity: 1, ease: 'none', duration: 0.4 }, 0.6)
+
+      return () => tl.scrollTrigger?.kill()
     })
 
-    gsap.set(lastPanel, { y: '100%', opacity: 0 })
-
-    const tl = gsap.timeline({
-      scrollTrigger: {
-        trigger: wrapper,
-        start: 'top top',
-        end: () => `+=${getScrollAmount()}`,
-        scrub: 1,
-        pin: true,
-        invalidateOnRefresh: true,
-      },
-    })
-
-    tl.to(track, { x: () => -getScrollAmount(), ease: 'none', duration: 1 }, 0)
-    tl.to(lastPanel, { y: '0%', opacity: 1, ease: 'none', duration: 0.4 }, 0.6)
-
-    return () => tl.scrollTrigger?.kill()
-  })
-
-  return () => ctx.revert()
-}, [])
+    return () => ctx.revert()
+  }, [])
 
   // scroll indicator — sync + fade
   useEffect(() => {
@@ -94,6 +97,36 @@ useEffect(() => {
     }
   }, [lenis])
 
+  // object panel
+  // anim: fade in + hold + fade out, staggered
+  useEffect(() => {
+    const section = objSectionRef.current
+    const objs = objRefs.current
+    if (!section || !objs.length) return
+
+    const ctx = gsap.context(() => {
+      gsap.set(objs, { y: 40, opacity: 0 })
+
+      const tl = gsap.timeline({
+        scrollTrigger: {
+          trigger: section,
+          start: 'top top',
+          end: '+=100%',
+          scrub: 1,
+          pin: true,
+          pinSpacing: true,
+          invalidateOnRefresh: true,
+        },
+      })
+
+      tl.to(objs, { y: 0, opacity: 1, stagger: 0.3, ease: 'none' })
+
+      return () => tl.scrollTrigger?.kill()
+    })
+
+    return () => ctx.revert()
+  }, [])
+
   return (
     <ReactLenis root options={{ autoRaf: false }}>
       <GsapTicker />
@@ -106,7 +139,7 @@ useEffect(() => {
       <section className="panel">2</section>
 
       <section className="hz-wrapper" style={{ backgroundColor: '#e7de57' }} ref={wrapperRef}>
-        <div className="hz-intro" ref={introRef}>
+        <div className="hz-intro" style={{ backgroundColor: '#57ade7' }} ref={introRef}>
           <div className="hz-track" style={{ backgroundColor: '#c243a2' }} ref={trackRef}>
             <div className="panel-space-big"></div>
             <div className="panel">H1</div>
@@ -120,7 +153,14 @@ useEffect(() => {
         </div>
       </section>
 
-      <section className="panel">3</section>
+      <section className="panel" style={{ position: 'relative' }} ref={objSectionRef}>
+        <div>3</div>
+          <div className="panel-object" ref={objParentRef}>
+            <div className="object" ref={(el) => objRefs.current[0] = el}>O1</div>
+            <div className="object" ref={(el) => objRefs.current[1] = el}>O2</div>
+            <div className="object" ref={(el) => objRefs.current[2] = el}>O3</div>
+          </div>
+      </section>
       <section className="panel">4</section>
     </ReactLenis>
   )
