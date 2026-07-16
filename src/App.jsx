@@ -16,55 +16,51 @@ export default function App() {
 
   const lenis = useLenis(ScrollTrigger.update)
 
-  useEffect(() => {
-    const track = trackRef.current
-    const wrapper = wrapperRef.current
-    const firstPanel = firstPanelRef.current
-    const lastPanel = lastPanelRef.current
+const introRef = useRef(null)
 
-    const ctx = gsap.context(() => {
-      const getScrollAmount = () => track.scrollWidth - window.innerWidth
+useEffect(() => {
+  const track = trackRef.current
+  const intro = introRef.current
+  const wrapper = wrapperRef.current
+  const lastPanel = lastPanelRef.current
 
-      // first panel padding shrink, before pin starts
-      gsap.set(firstPanel, { marginLeft: '80vw' })
-      gsap.to(firstPanel, {
-        marginLeft: '0vw',
-        ease: 'none',
-        scrollTrigger: {
-          trigger: wrapper,
-          start: 'top bottom',
-          end: 'top top',
-          scrub: 1,
-          invalidateOnRefresh: true,
-        },
-      })
+  const ctx = gsap.context(() => {
+    const getScrollAmount = () => track.scrollWidth - window.innerWidth
 
-      // last panel start state
-      gsap.set(lastPanel, { y: '100%', opacity: 0, width: '100vw' })
-
-      // pin timeline: track scroll (full) + last panel reveal (last 20%)
-      const tl = gsap.timeline({
-        scrollTrigger: {
-          trigger: wrapper,
-          start: 'top top',
-          end: () => `+=${getScrollAmount()}`,
-          scrub: 1,
-          pin: true,
-          invalidateOnRefresh: true,
-        },
-      })
-
-      tl.to(track, { x: () => -getScrollAmount(), ease: 'none', duration: 1 }, 0)
-      // for some reason, it needs to be equal to 1 to make it smooth, otherwise it will be snappy
-      // ex: duration 0.4, then the 3rd args 0.6
-      // so it's 0.4 + o.6 = 1
-      tl.to(lastPanel, { y: '0%', opacity: 1, ease: 'none', duration: 0.4 }, 0.6)
-
-      return () => tl.scrollTrigger?.kill()
+    gsap.set(intro, { x: '80vw' })
+    gsap.to(intro, {
+      x: '0vw',
+      ease: 'none',
+      scrollTrigger: {
+        trigger: wrapper,
+        start: 'top bottom',
+        end: 'top top',
+        scrub: 1,
+        invalidateOnRefresh: true,
+      },
     })
 
-    return () => ctx.revert()
-  }, [])
+    gsap.set(lastPanel, { y: '100%', opacity: 0 })
+
+    const tl = gsap.timeline({
+      scrollTrigger: {
+        trigger: wrapper,
+        start: 'top top',
+        end: () => `+=${getScrollAmount()}`,
+        scrub: 1,
+        pin: true,
+        invalidateOnRefresh: true,
+      },
+    })
+
+    tl.to(track, { x: () => -getScrollAmount(), ease: 'none', duration: 1 }, 0)
+    tl.to(lastPanel, { y: '0%', opacity: 1, ease: 'none', duration: 0.4 }, 0.6)
+
+    return () => tl.scrollTrigger?.kill()
+  })
+
+  return () => ctx.revert()
+}, [])
 
   // scroll indicator — sync + fade
   useEffect(() => {
@@ -110,15 +106,17 @@ export default function App() {
       <section className="panel">2</section>
 
       <section className="hz-wrapper" style={{ backgroundColor: '#e7de57' }} ref={wrapperRef}>
-        <div className="hz-track" style={{ backgroundColor: '#c243a2' }} ref={trackRef}>
-          <div className="panel-space-big" ref={firstPanelRef}></div>
-          <div className="panel">H1</div>
-          <div className="panel-space"></div>
-          <div className="panel">H2</div>
-          <div className="panel-space"></div>
-          <div className="panel">H3</div>
-          <div className="panel-space"></div>
-          <div className="panel" ref={lastPanelRef}>H4</div>
+        <div className="hz-intro" ref={introRef}>
+          <div className="hz-track" style={{ backgroundColor: '#c243a2' }} ref={trackRef}>
+            <div className="panel-space-big"></div>
+            <div className="panel">H1</div>
+            <div className="panel-space"></div>
+            <div className="panel">H2</div>
+            <div className="panel-space"></div>
+            <div className="panel">H3</div>
+            <div className="panel-space"></div>
+            <div className="panel" ref={lastPanelRef}>H4</div>
+          </div>
         </div>
       </section>
 

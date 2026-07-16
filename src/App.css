@@ -42,15 +42,18 @@ html.lenis body {
   overflow: hidden;
 }
 
+.hz-intro {
+  height: 100%;
+  width: max-content;
+}
+
 .hz-track {
   display: flex;
   align-items: center;
   height: 100%;
   width: max-content;
-  /* shrink-wraps to content, not fixed vw math */
-  /* gap: 4rem; */
-  /* padding-left: 20vw; */
-  /* breathing room start/end */
+  min-width: 100vw;
+  /* ← guarantees no gap ever, no matter when/if JS runs */
 }
 
 .hz-track .panel {
@@ -58,6 +61,10 @@ html.lenis body {
   /* whatever size makes sense per item — no longer forced 100vw */
   flex-shrink: 0;
   height: 60vh;
+}
+
+.hz-track .panel:last-child {
+  width: 100vw;
 }
 
 .panel:nth-child(odd) {
@@ -73,6 +80,7 @@ html.lenis body {
 .panel-space-big {
   height: 100%;
   width: 10em;
+  /* fixed, always in the layout, always counted in scrollWidth */
   background-color: #7afcb5;
 }
 
