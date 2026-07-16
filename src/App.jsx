@@ -106,7 +106,7 @@ export default function App() {
         <div className="scroll-indicator-bar" ref={scrollThumbRef}></div>
       </div>
 
-      <section className="panel">1</section>
+      <section className="panel font2">1</section>
       <section className="panel">2</section>
 
       <section className="hz-wrapper" style={{ backgroundColor: '#e7de57' }} ref={wrapperRef}>
