@@ -97,24 +97,22 @@ export default function App() {
     }
   }, [lenis])
 
-  // object panel
-  // anim: fade in + hold + fade out, staggered
+  // object panel — pin inner viewport-height content, outer wrapper supplies the scroll runway
   useEffect(() => {
-    const section = objSectionRef.current
+    const outer = objSectionRef.current
+    const inner = objParentRef.current
     const objs = objRefs.current
-    if (!section || !objs.length) return
+    if (!outer || !inner || !objs.length) return
 
     const ctx = gsap.context(() => {
       gsap.set(objs, { y: 40, opacity: 0 })
 
       const tl = gsap.timeline({
         scrollTrigger: {
-          trigger: section,
+          trigger: outer,
           start: 'top top',
-          end: '+=100%',
-          scrub: 1,
-          pin: true,
-          pinSpacing: true,
+          end: 'bottom bottom',
+          scrub: 1.5,
           invalidateOnRefresh: true,
         },
       })
@@ -153,14 +151,21 @@ export default function App() {
         </div>
       </section>
 
-      <section className="panel" style={{ position: 'relative' }} ref={objSectionRef}>
-        <div>3</div>
-          <div className="panel-object" ref={objParentRef}>
+      {/* <section className="panel">buffer</section> */}
+
+      <div ref={objSectionRef} style={{ height: '250vh', position: 'relative' }}>
+        <section className="panel" style={{ position: 'sticky', top: 0, height: '100vh' }} ref={objParentRef}>
+          <div>3</div>
+          <div className="panel-object">
             <div className="object" ref={(el) => objRefs.current[0] = el}>O1</div>
             <div className="object" ref={(el) => objRefs.current[1] = el}>O2</div>
             <div className="object" ref={(el) => objRefs.current[2] = el}>O3</div>
           </div>
-      </section>
+        </section>
+      </div>
+
+      {/* <section className="panel">buffer</section> */}
+
       <section className="panel">4</section>
     </ReactLenis>
   )

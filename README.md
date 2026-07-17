@@ -10,7 +10,12 @@ Project shows a long vertical page that contains a pinned horizontal section wit
 - Horizontal section animated with `gsap` + `ScrollTrigger`
 - Vertical page flow contains a pinned `hz-wrapper` section that scrolls a wide track horizontally
 - Last horizontal panel reveals while the section remains pinned
+- Hold the page as its object shows up
 - Custom scroll indicator synced to lenis scroll progress
+
+## Demo
+
+Visit demo page [here](https://lenis-hz.onslate.com)
 
 ## Key files
 
